@@ -1,5 +1,5 @@
 # dotnet-core-mock-web-server
-呼び出し元のHeader・Body情報をコンソール出力する.NET CoreのWebサーバ
+呼び出し元のHeader・Body情報をコンソール・レスポンス出力する.NET CoreのWebサーバ
 
 # Usage
 - 発行しコマンドラインより実行する。
