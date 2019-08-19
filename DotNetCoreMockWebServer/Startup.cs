@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +12,7 @@ namespace DotNetCoreMockWebServer
 {
     public class Startup
     {
-        ILogger _logger;
+        readonly ILogger _logger;
 
         public Startup(ILoggerFactory loggerFactory)
         {
@@ -42,17 +41,19 @@ namespace DotNetCoreMockWebServer
             {
                 var req = context.Request;
 
-                var output = new List<string>();
-                output.Add("-------------Request Information Start-------------");
-                output.Add($"Time[{DateTime.Now}]");
-                output.Add($"Scheme[{req.Scheme}]");
-                output.Add($"Path[{req.Path}]");
-                output.Add($"QueryString[{req.QueryString}]");
-                output.Add($"Method[{req.Method}]");
-                output.Add($"ContentLength[{req.ContentLength}]");
-                output.Add($"ContentType[{req.ContentType}]");
+                var output = new List<string>
+                {
+                    "-------------Request Information Start-------------",
+                    $"Time[{DateTime.Now}]",
+                    $"Scheme[{req.Scheme}]",
+                    $"Path[{req.Path}]",
+                    $"QueryString[{req.QueryString}]",
+                    $"Method[{req.Method}]",
+                    $"ContentLength[{req.ContentLength}]",
+                    $"ContentType[{req.ContentType}]",
 
-                output.Add("-------------Body-------------");
+                    "-------------Body-------------"
+                };
                 using (var reader = new StreamReader(req.Body))
                 {
                     var body = reader.ReadToEnd();
@@ -69,7 +70,10 @@ namespace DotNetCoreMockWebServer
                 output.Add("-------------Request Information End-------------");
                                 
                 _logger.LogInformation(string.Join(Environment.NewLine, output));
+
                 await context.Response.WriteAsync("Request Success");
+                await context.Response.WriteAsync(Environment.NewLine);
+                await context.Response.WriteAsync(string.Join(Environment.NewLine, output));
             });
         }
     }
