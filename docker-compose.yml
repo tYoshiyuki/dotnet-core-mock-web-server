@@ -1,0 +1,8 @@
+version: '3'
+services:
+    dotnet-core-mock-webserver:
+        image: wasimaru/dotnetcoremockwebserver:latest
+        container_name: dotnet-core-mock-webserver
+        tty: true
+        ports:
+            - 30080:80
