@@ -5,32 +5,27 @@ using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace DotNetCoreMockWebServer
 {
     public class Startup
     {
-        readonly ILogger _logger;
-
-        public Startup(ILoggerFactory loggerFactory)
-        {
-            _logger = loggerFactory.CreateLogger<Startup>();
-        }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging(option =>
+            services.Configure<KestrelServerOptions>(options =>
             {
-                option.AddConsole();
+                options.AllowSynchronousIO = true;
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -61,15 +56,20 @@ namespace DotNetCoreMockWebServer
                 }
 
                 output.Add("-------------Headers--------------");
-                output.Add($"Headers Count[{req.Headers.AsEnumerable().Count()}]");
 
-                foreach (var h in req.Headers.AsEnumerable())
+                output.Add($"Headers Count[{req.Headers?.AsEnumerable().Count() ?? 0}]");
+
+                if (req.Headers != null)
                 {
-                    output.Add($"{h.Key}[{h.Value}]");
+                    foreach (var h in req.Headers.AsEnumerable())
+                    {
+                        output.Add($"{h.Key}[{h.Value}]");
+                    }
                 }
+
                 output.Add("-------------Request Information End-------------");
-                                
-                _logger.LogInformation(string.Join(Environment.NewLine, output));
+
+                logger.LogInformation(string.Join(Environment.NewLine, output));
 
                 await context.Response.WriteAsync("Request Success");
                 await context.Response.WriteAsync(Environment.NewLine);
