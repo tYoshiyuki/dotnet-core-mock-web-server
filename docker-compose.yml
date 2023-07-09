@@ -4,5 +4,7 @@ services:
         image: wasimaru/dotnetcoremockwebserver:latest
         container_name: dotnet-core-mock-webserver
         tty: true
+        environment:
+        - ASPNETCORE_URLS=http://+:80
         ports:
             - 30080:80
